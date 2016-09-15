@@ -1,8 +1,11 @@
 //NOTE: change this if you want to init transactions from a different account
 primaryAddress = eth.accounts[0];
 
-var addresses = ["0x7454688c5941897917a852d6887ea79158a107d6", "0x7454688c5941897917a852d6887ea79158a107d6", "0xb01c1ec86fe3668d6b22fb1bde30482f75529aef", "0x107c98584d4b18bc54e1d74f4d7a0bf505ca466f", "0xb19411a9361b22c7d7fe2684639bbbfaa48baae4", "0xa3bff1dfa9971668360c0d82828432e27bf54e67", "0xdc599358ea9d78fbe211b1a96eef766b93571833", "0x6d50D393Eeb679635D729bc6A64B9C71577c572e", "0xfd1cdf4338eeedd9890443d9402808c9cd04f329", "0xE363550833477d7706Aad53Da67366ab1a70C3cD", "0xED962035fA4C80a018915404557E5E05680cafb5", "0xbd3f4d0a53e1957e72bef1bc99e6e552e803456c", "0xf218d6d5fe50ef0dfccc64219f5f9fb9be7a72bc", "0xf19aad8330794943f4857ec87f4c0f79d3169033", "0xa2e63263a50641b5608c4866a99b89b696d76885", "0xf3731A397D198a526EF77bD99906873936f05AB8", "0x550EC205227D3026BEB3b9B05f5da7917EB763d2", "0x10de0b9297f03de2e8975809cb378fae97024824", "0x642f362d9714d521d11faef7428c6e882e91833b", "0xa1a99159d82e3f0f5322c3ff5b7dbd9119dff0b1"];
-var balances = [316.1399117351375, 316.13991173513375, 406.86291583324993, 3459.157456885799, 406.86291583324993, 170.80812794359545, 406.86291583324993, 742.9670636955, 2034.31457916625, 310.0295418649365, 101.71572895831248, 159.24289035380738, 2034.31457916625, 45.37526462942845, 14959.317383698402, 326.40286108874744, 203.43145791662496, 146.5619285106526, 16.547999271537915, 207.5000870749575];
+var batchSize = 3;
+var fxp = Math.pow(10, 18);
+
+var addresses = ["0x7454688c5941897917a852d6887ea79158a107d6", "0xb01c1ec86fe3668d6b22fb1bde30482f75529aef", "0x107c98584d4b18bc54e1d74f4d7a0bf505ca466f", "0xb19411a9361b22c7d7fe2684639bbbfaa48baae4", "0xa3bff1dfa9971668360c0d82828432e27bf54e67", "0xdc599358ea9d78fbe211b1a96eef766b93571833", "0x6d50D393Eeb679635D729bc6A64B9C71577c572e", "0xfd1cdf4338eeedd9890443d9402808c9cd04f329", "0xE363550833477d7706Aad53Da67366ab1a70C3cD", "0xED962035fA4C80a018915404557E5E05680cafb5", "0xbd3f4d0a53e1957e72bef1bc99e6e552e803456c", "0xf218d6d5fe50ef0dfccc64219f5f9fb9be7a72bc", "0xf19aad8330794943f4857ec87f4c0f79d3169033", "0xa2e63263a50641b5608c4866a99b89b696d76885", "0xf3731A397D198a526EF77bD99906873936f05AB8", "0x550EC205227D3026BEB3b9B05f5da7917EB763d2", "0x10de0b9297f03de2e8975809cb378fae97024824", "0x642f362d9714d521d11faef7428c6e882e91833b", "0xa1a99159d82e3f0f5322c3ff5b7dbd9119dff0b1"];
+var balances = [316.13991173513375, 406.86291583324993, 3459.157456885799, 406.86291583324993, 170.80812794359545, 406.86291583324993, 742.9670636955, 2034.31457916625, 310.0295418649365, 101.71572895831248, 159.24289035380738, 2034.31457916625, 45.37526462942845, 14959.317383698402, 326.40286108874744, 203.43145791662496, 146.5619285106526, 16.547999271537915, 207.5000870749575];
 
 var repContract = null;
 
@@ -109,35 +112,44 @@ var loadRepContract = function(){
 	});
 }
 
-var batchSize = 3;
-var fxp = Math.pow(10, 18);
-
 var initializeRepBalances = function(start){
 
-	if (addresses.length != balances.length){
-		console.log("WARNING: addresses/balances array mismatch");
-	}
+    if (addresses.length != balances.length){
+        console.log("WARNING: addresses/balances array mismatch");
+    }
 
-	if (start >= addresses.length){
-		console.log("done");
-		return;
-	}
-	
-	console.log("loading addresses", start, "through", Math.min(start + batchSize -1, addresses.length) , "/", addresses.length);
+    if (start >= addresses.length){
+        console.log("done");
+        return;
+    }
+    
+    console.log("loading addresses", start, "through", Math.min(start + batchSize -1, addresses.length) , "/", addresses.length);
 
-	var addrBatch = addresses.slice(start, start + batchSize);
-	//convert balances to 10^18 fixed point
-	var balanceBatch = balances.slice(start, start + batchSize).map( function(n) {return n * fxp});
-
-	repContract.setSaleDistribution(addrBatch, balanceBatch, {from: primaryAddress, gas: 2000000},
-		function (error, obj) {
-		    if (error) {
-		        console.log("error", error);
-		    } else {
-		    	return initializeBalances(start + batchSize);
-		    }
-		}
-	);
+    var addrBatch = addresses.slice(start, start + batchSize);
+    //convert balances to 10^18 fixed point
+    var balanceBatch = balances.slice(start, start + batchSize).map( function(n) {return n * fxp});
+    repContract.setSaleDistribution(addrBatch, balanceBatch, {from: primaryAddress, gas: 2000000}, function (error, tx) {
+        if (error) {
+            console.log("error", error);
+        } else {
+            var txPoll = function(){
+                var receipt = eth.getTransactionReceipt(tx);
+                if (receipt != null){
+                    return initializeRepBalances(start + batchSize);
+                }
+                setTimeout(txPoll, 3000);
+            };
+            txPoll();
+        }
+    });
 }
 
+var validateBalances = function(){
+    for (var i = 0; i < addresses.length; ++i){
+        var balance = repContract.balanceOf.call(addresses[i]);
+        if (balances[i] * fxp != balance){
+            console.log("ERROR: balance on contract for", addresses[i], "is", balance / fxp, ", expected", balances[i]);
+        }
+    }
+}
 
