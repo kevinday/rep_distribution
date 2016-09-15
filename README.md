@@ -1,10 +1,10 @@
-The code in `rep_distribution.js` can be pasted into a geth console to initialize the rep contract.
+The code in `rep_distribution.js` can be loaded into a geth console to initialize the rep contract.
 
 Note that at the top of this file the line `primaryAddress = eth.accounts[0];`
 
 If you'd like to initiate transactions from a different account, please change this.
 
-After copying into the console (this takes a long time due to the size of the address/balance arrays), do the following:
+Copying this into the console takes a very long time due to the size of the balance/address arrays. Instead, it is best to launch get with `--preload rep_distribution.js console`
 
 To load the rep contract, call
 `loadRepContract()`
