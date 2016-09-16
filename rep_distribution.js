@@ -128,7 +128,7 @@ var initializeRepBalances = function(start){
     var addrBatch = addresses.slice(start, start + batchSize);
     //convert balances to 10^18 fixed point
     var balanceBatch = balances.slice(start, start + batchSize).map( function(n) {return n * fxp});
-    repContract.setSaleDistribution(addrBatch, balanceBatch, {from: primaryAddress, gas: 2000000}, function (error, tx) {
+    repContract.setSaleDistribution(addrBatch, balanceBatch, {from: primaryAddress, gas: 3500000}, function (error, tx) {
         if (error) {
             console.log("error", error);
         } else {
